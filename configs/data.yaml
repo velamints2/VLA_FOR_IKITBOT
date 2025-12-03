@@ -1,0 +1,22 @@
+# YOLO训练配置
+# 用于YOLOv10/v11的数据集配置
+
+# 数据路径（相对于本文件）
+path: ../data/seed_dataset  # 数据集根目录
+train: train.txt  # 训练集列表文件
+val: val.txt      # 验证集列表文件
+
+# 类别数量
+nc: 3
+
+# 类别名称
+names:
+  0: wire         # 电线/数据线
+  1: shoe         # 拖鞋/鞋子
+  2: small_object # 小物体
+
+# 训练参数（可在命令行覆盖）
+# imgsz: 640     # 输入图像大小
+# epochs: 100    # 训练轮数
+# batch: 16      # batch大小
+# workers: 4     # 数据加载线程数
