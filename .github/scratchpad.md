@@ -74,46 +74,25 @@
 #### 下午任务块（13:00-18:00）：数据获取与处理
 
 ##### 1.4 从合作方获取RGBD数据 [预计1小时]
-- [ ] 1.4.1 `request_rgbd_data()` - 联系奇勃科技获取RGBD视频流样本
-- [ ] 1.4.2 `download_data()` - 下载数据到`data/raw/`目录
-- [ ] 1.4.3 `verify_data_integrity()` - 验证数据完整性（文件大小、格式）
-- [ ] 1.4.4 `parse_rgbd_format()` - 解析RGBD数据格式（.bag/.mkv/.oni）
+- [x] 1.4.1 `request_rgbd_data()` - 联系奇勃科技获取RGBD视频流样本
+- [x] 1.4.2 `download_data()` - 下载数据到`data/raw/`目录
+- [x] 1.4.3 `verify_data_integrity()` - 验证数据完整性（5个.bag文件，共~500MB）
+- [x] 1.4.4 `parse_rgbd_format()` - 确认为RealSense .bag格式
 
 ##### 1.5 数据探索与分析 [预计2小时]
-- [ ] 1.5.1 `extract_frames_from_rgbd()` - 从RGBD视频提取RGB+Depth帧
-  - 输入：RGBD视频文件
-  - 输出：`data/frames/rgb/` + `data/frames/depth/`
-  - 采样率：2-5 FPS（避免冗余）
-- [ ] 1.5.2 `analyze_image_statistics()` - 统计分析：
-  - 分辨率分布
-  - 亮度/对比度统计
-  - Depth范围分布
-  - 场景类型（室内/地面视角）
-- [ ] 1.5.3 `visualize_rgbd_samples()` - 可视化样本（RGB+Depth叠加显示）
-- [ ] 1.5.4 `identify_typical_obstacles()` - 人工快速浏览，识别典型障碍物类型：
-  - 电线/数据线
-  - 拖鞋/鞋子
-  - 玩具/小物体
-  - 门槛/地面突起
-- [ ] 1.5.5 `write_data_exploration_report()` - 撰写数据探索笔记（docs/day1_data_analysis.md）
+- [⏳] 1.5.1 `extract_frames_from_rgbd()` - 正在安装librealsense（brew install）
+- [ ] 1.5.2 `analyze_image_statistics()` - 统计分析
+- [ ] 1.5.3 `visualize_rgbd_samples()` - 可视化样本
+- [ ] 1.5.4 `identify_typical_obstacles()` - 识别典型障碍物类型
+- [ ] 1.5.5 `write_data_exploration_report()` - 撰写数据探索笔记
 
 ##### 1.6 创建种子数据集 [预计2小时]
 - [ ] 1.6.1 `select_seed_frames()` - 精选50-100张最具代表性的帧
-  - 标准：场景多样性、光照变化、障碍物典型性
-  - 输出：`data/seed_dataset/images/`
 - [ ] 1.6.2 `setup_labelimg_tool()` - 安装并配置LabelImg标注工具
-- [ ] 1.6.3 `define_obstacle_classes()` - 定义障碍物类别（classes.txt）：
-  - 0: wire（电线）
-  - 1: shoe（拖鞋/鞋子）
-  - 2: small_object（小物体）
+- [ ] 1.6.3 `define_obstacle_classes()` - 定义障碍物类别（已完成）
 - [ ] 1.6.4 `annotate_seed_dataset()` - 快速标注（YOLO格式）
-  - 优先级：先标注明显障碍物，边界模糊的跳过
-  - 输出：`data/seed_dataset/labels/`
-- [ ] 1.6.5 `validate_annotations()` - 验证标注质量：
-  - 检查标注文件与图像是否一一对应
-  - 可视化验证：随机抽取10张查看标注框
+- [ ] 1.6.5 `validate_annotations()` - 验证标注质量
 - [ ] 1.6.6 `split_train_val()` - 划分训练集/验证集（80/20）
-  - 输出：`data/seed_dataset/train.txt` + `val.txt`
 
 #### 晚上任务块（19:00-21:00）：验证与文档
 
