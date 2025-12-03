@@ -23,29 +23,19 @@ wheels/
 .installed.cfg
 *.egg
 
-# Data files (大文件不上传)
+# Data files (原始大文件不上传)
 data/raw/*.bag
 data/extracted_frames/
-data/frames/
-data/seed_dataset/images/
 *.mkv
 *.oni
 *.mp4
 *.avi
-*.jpg
-*.jpeg
-*.png
-*.bmp
 
-# Model files (大文件不上传)
-models/pretrained/*.pt
-models/pretrained/*.pth
+# Model files (训练过程文件不上传)
 models/checkpoints/
 *.onnx
 *.trt
 *.engine
-*.pt
-*.pth
 runs/
 
 # 保留必要的配置文件
