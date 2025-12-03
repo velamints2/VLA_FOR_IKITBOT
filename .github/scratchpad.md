@@ -65,32 +65,11 @@
 - [ ] 1.2.7 `benchmark_jetson_baseline()` - 基准测试：记录空载性能（CPU/GPU/内存）
 
 ##### 1.3 Git仓库与项目结构 [预计30分钟]
-- [ ] 1.3.1 `init_git_repo()` - 初始化Git仓库
-- [ ] 1.3.2 `create_project_structure()` - 创建目录结构：
-  ```
-  llm/
-  ├── data/
-  │   ├── raw/           # 原始RGBD视频
-  │   ├── frames/        # 提取的帧
-  │   ├── annotations/   # 标注文件（YOLO格式）
-  │   └── seed_dataset/  # 种子数据集
-  ├── models/
-  │   ├── pretrained/    # 预训练权重
-  │   ├── checkpoints/   # 训练检查点
-  │   └── deployed/      # 部署模型（ONNX/TensorRT）
-  ├── src/
-  │   ├── data_processing/  # 数据处理脚本
-  │   ├── training/         # 训练脚本
-  │   ├── deployment/       # 部署脚本
-  │   └── utils/            # 工具函数
-  ├── tests/             # 测试代码
-  ├── docs/              # 文档
-  ├── scripts/           # 自动化脚本
-  └── configs/           # 配置文件
-  ```
-- [ ] 1.3.3 `create_gitignore()` - 创建.gitignore（排除数据、权重、缓存）
-- [ ] 1.3.4 `create_readme()` - 创建README.md基本框架
-- [ ] 1.3.5 `initial_commit()` - 首次提交
+- [x] 1.3.1 `init_git_repo()` - 初始化Git仓库
+- [x] 1.3.2 `create_project_structure()` - 创建目录结构
+- [x] 1.3.3 `create_gitignore()` - 创建.gitignore
+- [x] 1.3.4 `create_readme()` - 创建README.md基本框架
+- [x] 1.3.5 `initial_commit()` - 首次提交
 
 #### 下午任务块（13:00-18:00）：数据获取与处理
 
