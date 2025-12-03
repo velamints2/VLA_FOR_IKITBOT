@@ -1,149 +1,124 @@
 # Jetson Nano 部署环境配置指南
 
 ## 概述
-本文档描述如何在Jetson Nano上配置障碍物检测系统的部署环境。
+
+本文档描述如何在 Jetson Nano 上配置障碍物检测系统的部署环境。
+
+**已验证配置**: 
+- Jetson Nano Developer Kit
+- JetPack 4.6.x (L4T R32.7.1)
+- CUDA 10.2 + cuDNN 8.2.1 + TensorRT 8.2.1
 
 ## 硬件要求
-- Jetson Nano 开发板
-- microSD卡（至少32GB，推荐64GB）
-- 电源适配器（5V 4A）
-- RGBD摄像头（如RealSense D435）
 
-## 1. 系统安装
+| 组件 | 规格 |
+|------|------|
+| 开发板 | Jetson Nano 4GB |
+| microSD | ≥32GB (推荐 64GB) |
+| 电源 | 5V 4A DC 电源适配器 |
+| 摄像头 | CSI (IMX219) 或 USB 摄像头 |
 
-### 1.1 烧录JetPack
-1. 下载JetPack 4.6或更高版本
-2. 使用Balena Etcher烧录到SD卡
-3. 首次启动配置用户名密码
+## 1. 快速配置 (推荐)
 
-### 1.2 系统更新
+上传并运行一键配置脚本：
+
+```bash
+# 从开发机上传脚本
+scp scripts/setup_jetson.sh user@<jetson-ip>:~/
+
+# SSH 到 Jetson
+ssh user@<jetson-ip>
+
+# 运行配置脚本
+bash ~/setup_jetson.sh
+```
+
+## 2. 手动配置
+
+### 2.1 安装 pip3
+
 ```bash
 sudo apt update
-sudo apt upgrade -y
+sudo apt install -y python3-pip
 ```
 
-## 2. 安装CUDA和TensorRT
+### 2.2 配置 pip 镜像 (加速下载)
 
-JetPack已预装CUDA和TensorRT，验证安装：
 ```bash
-# 检查CUDA
-nvcc --version
-
-# 检查TensorRT
-dpkg -l | grep TensorRT
+mkdir -p ~/.pip
+cat > ~/.pip/pip.conf << 'EOF'
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+trusted-host = pypi.tuna.tsinghua.edu.cn
+timeout = 120
+EOF
 ```
 
-## 3. 安装Python环境
+### 2.3 安装 PyTorch for Jetson
 
-### 3.1 安装pip
 ```bash
-sudo apt install python3-pip -y
-pip3 install --upgrade pip
+# 下载 PyTorch 1.10.0 (JetPack 4.6)
+cd /tmp
+wget https://nvidia.box.com/shared/static/fjtbno0vpo676a25cgvuqc1wty0fkkg6.whl \
+    -O torch-1.10.0-cp36-cp36m-linux_aarch64.whl
+
+# 安装依赖
+sudo apt install -y libopenblas-base libopenmpi-dev libomp-dev
+
+# 安装 PyTorch
+pip3 install torch-1.10.0-cp36-cp36m-linux_aarch64.whl
 ```
 
-### 3.2 安装基础依赖
-```bash
-# NumPy和OpenCV
-sudo apt install python3-numpy python3-opencv -y
+### 2.4 安装其他依赖
 
-# 或从pip安装（可能需要从源编译）
-pip3 install numpy
+```bash
+pip3 install pillow pyyaml tqdm
 ```
 
-## 4. 安装推理框架
+## 3. 验证安装
 
-### 4.1 安装NVIDIA jetson-inference
 ```bash
-# 克隆仓库
-cd ~
-git clone --recursive https://github.com/dusty-nv/jetson-inference
-cd jetson-inference
+python3 -c "
+import torch
+print('PyTorch:', torch.__version__)
+print('CUDA:', torch.cuda.is_available())
+if torch.cuda.is_available():
+    print('GPU:', torch.cuda.get_device_name(0))
 
-# 编译和安装
-mkdir build
-cd build
-cmake ../
-make -j$(nproc)
-sudo make install
-sudo ldconfig
+import tensorrt as trt
+print('TensorRT:', trt.__version__)
+
+import cv2
+print('OpenCV:', cv2.__version__)
+"
 ```
 
-### 4.2 安装ONNX Runtime
-```bash
-# 从NVIDIA预编译版本安装
-wget https://nvidia.box.com/shared/static/xxx.whl
-pip3 install onnxruntime_gpu-1.x.x-cp36-cp36m-linux_aarch64.whl
+预期输出：
+```
+PyTorch: 1.10.0
+CUDA: True
+GPU: NVIDIA Tegra X1
+TensorRT: 8.2.1.8
+OpenCV: 4.1.1
 ```
 
-## 5. 安装RealSense SDK
+## 4. 性能优化
 
-### 5.1 安装依赖
+### 4.1 设置最大性能模式
+
 ```bash
-sudo apt install git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev -y
-sudo apt install libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev -y
-```
-
-### 5.2 编译安装librealsense
-```bash
-cd ~
-git clone https://github.com/IntelRealSense/librealsense.git
-cd librealsense
-mkdir build && cd build
-
-cmake ../ -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=true -DBUILD_PYTHON_BINDINGS=true
-make -j$(nproc)
-sudo make install
-```
-
-### 5.3 配置udev规则
-```bash
-cd ~/librealsense
-sudo cp config/99-realsense-libusb.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
-
-### 5.4 验证安装
-```bash
-# 测试RealSense
-realsense-viewer
-
-# 测试Python绑定
-python3 -c "import pyrealsense2 as rs; print('RealSense OK')"
-```
-
-## 6. 测试环境
-
-### 6.1 测试RGBD摄像头
-```bash
-cd /path/to/llm
-python3 scripts/test_rgbd_stream.py
-```
-
-### 6.2 测试TensorRT推理
-```bash
-# 使用示例模型测试
-cd ~/jetson-inference/build/aarch64/bin
-./imagenet-console test.jpg output.jpg
-```
-
-## 7. 性能优化
-
-### 7.1 设置最大性能模式
-```bash
-# 查看当前模式
-sudo nvpmodel -q
-
-# 设置为最大性能模式（MODE 0）
+# 设置 MAXN 模式
 sudo nvpmodel -m 0
 
-# 设置风扇为最大速度
+# 启用 jetson_clocks
 sudo jetson_clocks
 ```
 
-### 7.2 增加swap空间
+### 4.2 增加 Swap 空间
+
 ```bash
-# 创建8GB swap文件
-sudo fallocate -l 8G /swapfile
+# 创建 4GB swap
+sudo fallocate -l 4G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
@@ -152,51 +127,54 @@ sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
-## 8. 基准测试
+## 5. 测试摄像头
 
-运行基准测试脚本：
 ```bash
-python3 scripts/benchmark_jetson.py
+python3 -c "
+import cv2
+cap = cv2.VideoCapture(0)
+ret, frame = cap.read()
+if ret:
+    print('Camera:', frame.shape[1], 'x', frame.shape[0])
+else:
+    print('Camera: Failed')
+cap.release()
+"
 ```
 
-预期性能指标：
-- YOLOv10n (FP16): 15-20 FPS @ 640x640
-- YOLOv10n (INT8): 25-30 FPS @ 640x640
-- 内存占用: < 2GB
+## 6. 运行环境测试
 
-## 9. 常见问题
-
-### Q1: CUDA out of memory
-**解决方案**：
-- 减小输入图像分辨率
-- 使用INT8量化
-- 增加swap空间
-
-### Q2: RealSense无法识别
-**解决方案**：
 ```bash
-# 重新加载USB设备
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+# 上传测试脚本
+scp src/deployment/jetson_test.py user@<jetson-ip>:~/
 
-# 检查USB连接
-lsusb | grep Intel
+# 运行完整测试
+python3 ~/jetson_test.py all
 ```
 
-### Q3: TensorRT转换失败
-**解决方案**：
-- 确保ONNX opset版本兼容
-- 检查TensorRT版本（建议8.x）
-- 简化模型结构
+## 7. 当前环境状态 (已验证)
 
-## 10. 下一步
+| 组件 | 版本 | 状态 |
+|------|------|------|
+| L4T | R32.7.1 | ✅ |
+| CUDA | 10.2.300 | ✅ |
+| cuDNN | 8.2.1.32 | ✅ |
+| TensorRT | 8.2.1.8 | ✅ |
+| Python | 3.6.9 | ✅ |
+| PyTorch | 1.10.0 | ✅ |
+| OpenCV | 4.1.1 | ✅ |
+| Pillow | 8.4.0 | ✅ |
+| pip3 | 21.3.1 | ✅ |
 
-环境配置完成后：
-1. 部署训练好的模型（参考 `src/deployment/deploy_jetson.py`）
-2. 运行实时检测测试
-3. 集成到机器人控制系统
+## 8. SSH 连接信息
+
+```bash
+# 当前测试设备
+ssh velamints@192.168.0.219
+```
 
 ## 参考资料
+
 - [NVIDIA Jetson Documentation](https://developer.nvidia.com/embedded/jetson-nano-developer-kit)
-- [RealSense for Jetson](https://github.com/IntelRealSense/librealsense/blob/master/doc/installation_jetson.md)
+- [PyTorch for Jetson](https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048)
 - [TensorRT Documentation](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/)

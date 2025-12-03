@@ -1,5 +1,5 @@
 #!/bin/bash
-# 编译和运行C++版本的.bag提取工具
+# 编译和运行C++版本的.bag提取工具 (无OpenCV依赖版)
 
 set -e
 
@@ -17,20 +17,16 @@ if ! pkg-config --exists realsense2; then
     exit 1
 fi
 
-if ! pkg-config --exists opencv4; then
-    echo "错误: OpenCV 未安装"
-    echo ""
-    echo "macOS安装方法:"
-    echo "  brew install opencv"
-    echo ""
-    exit 1
-fi
-
 # 编译
 echo "正在编译..."
+REALSENSE_PREFIX=$(brew --prefix librealsense)
+echo "RealSense Prefix: ${REALSENSE_PREFIX}"
+
 g++ -std=c++11 \
     src/data_processing/extract_bag_frames.cpp \
-    $(pkg-config --cflags --libs realsense2 opencv4) \
+    -I"${REALSENSE_PREFIX}/include" \
+    -L"${REALSENSE_PREFIX}/lib" \
+    -lrealsense2 \
     -o extract_bag_frames
 
 echo "✓ 编译成功！"
@@ -40,12 +36,27 @@ echo "开始提取帧..."
 echo "=========================================="
 
 # 运行（处理所有.bag文件）
-for bag_file in data/raw/*.bag; do
-    if [ -f "$bag_file" ]; then
-        echo "处理: $bag_file"
-        ./extract_bag_frames "$bag_file" "data/frames" 5
-        echo ""
-    fi
+# 检查是否有bag文件
+shopt -s nullglob
+bag_files=(data/raw/*.bag)
+if [ ${#bag_files[@]} -eq 0 ]; then
+    echo "警告: data/raw/ 目录下没有找到 .bag 文件"
+    exit 0
+fi
+
+for bag_file in "${bag_files[@]}"; do
+    echo "处理: $bag_file"
+    # 为每个bag文件创建一个子目录
+    filename=$(basename -- "$bag_file")
+    filename="${filename%.*}"
+    output_dir="data/frames/$filename"
+    
+    ./extract_bag_frames "$bag_file" "$output_dir" 5
+    
+    echo "转换 Raw -> Image ($filename)..."
+    python src/data_processing/convert_raw_to_png.py "$output_dir"
+    
+    echo ""
 done
 
 echo "=========================================="

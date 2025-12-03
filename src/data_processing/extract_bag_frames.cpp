@@ -1,15 +1,15 @@
 /*
- * RealSense .bag文件帧提取工具 (C++)
- * 使用librealsense库提取RGB和Depth帧
+ * RealSense .bag文件帧提取工具 (C++ - 无OpenCV依赖版)
+ * 使用librealsense库提取RGB和Depth原始数据
  * 
- * 编译: g++ -std=c++11 extract_bag_frames.cpp -lrealsense2 -lopencv_core -lopencv_imgcodecs -o extract_bag_frames
+ * 编译: g++ -std=c++11 extract_bag_frames.cpp -lrealsense2 -o extract_bag_frames
  * 
  * 使用: ./extract_bag_frames <bag_file> <output_dir> [sample_rate]
  */
 
 #include <librealsense2/rs.hpp>
-#include <opencv2/opencv.hpp>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <sys/stat.h>
@@ -18,6 +18,17 @@
 bool create_directory(const std::string& path) {
     std::string cmd = "mkdir -p " + path;
     return system(cmd.c_str()) == 0;
+}
+
+// 保存原始二进制数据
+void save_raw_data(const std::string& filename, const void* data, size_t size) {
+    std::ofstream outfile(filename, std::ios::out | std::ios::binary);
+    if (outfile) {
+        outfile.write((const char*)data, size);
+        outfile.close();
+    } else {
+        std::cerr << "无法写入文件: " << filename << "\n";
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -32,7 +43,7 @@ int main(int argc, char* argv[]) {
     int sample_rate = (argc >= 4) ? std::stoi(argv[3]) : 2;
 
     std::cout << "=========================================================\n";
-    std::cout << "RealSense .bag 文件帧提取工具\n";
+    std::cout << "RealSense .bag 文件帧提取工具 (Raw Mode)\n";
     std::cout << "=========================================================\n";
     std::cout << "输入文件: " << bag_file << "\n";
     std::cout << "输出目录: " << output_dir << "\n";
@@ -40,8 +51,8 @@ int main(int argc, char* argv[]) {
     std::cout << "=========================================================\n\n";
 
     // 创建输出目录
-    std::string rgb_dir = output_dir + "/rgb";
-    std::string depth_dir = output_dir + "/depth";
+    std::string rgb_dir = output_dir + "/rgb_raw";
+    std::string depth_dir = output_dir + "/depth_raw";
     
     if (!create_directory(rgb_dir) || !create_directory(depth_dir)) {
         std::cerr << "错误: 无法创建输出目录\n";
@@ -62,6 +73,7 @@ int main(int argc, char* argv[]) {
 
         int frame_count = 0;
         int saved_count = 0;
+        bool metadata_saved = false;
 
         // 主循环
         while (true) {
@@ -77,33 +89,40 @@ int main(int argc, char* argv[]) {
                     rs2::depth_frame depth_frame = frames.get_depth_frame();
 
                     if (color_frame && depth_frame) {
-                        // RGB帧转OpenCV Mat
-                        cv::Mat rgb_image(cv::Size(color_frame.get_width(), 
-                                                   color_frame.get_height()),
-                                         CV_8UC3,
-                                         (void*)color_frame.get_data(),
-                                         cv::Mat::AUTO_STEP);
-                        
-                        // Depth帧转OpenCV Mat
-                        cv::Mat depth_image(cv::Size(depth_frame.get_width(),
-                                                     depth_frame.get_height()),
-                                           CV_16UC1,
-                                           (void*)depth_frame.get_data(),
-                                           cv::Mat::AUTO_STEP);
+                        int width = color_frame.get_width();
+                        int height = color_frame.get_height();
+                        int depth_width = depth_frame.get_width();
+                        int depth_height = depth_frame.get_height();
+
+                        // 保存元数据（仅一次）
+                        if (!metadata_saved) {
+                            std::ofstream meta(output_dir + "/metadata.txt");
+                            meta << "rgb_width=" << width << "\n";
+                            meta << "rgb_height=" << height << "\n";
+                            meta << "depth_width=" << depth_width << "\n";
+                            meta << "depth_height=" << depth_height << "\n";
+                            meta << "rgb_format=RGB8\n";
+                            meta << "depth_format=Z16\n";
+                            meta.close();
+                            metadata_saved = true;
+                            std::cout << "元数据已保存: " << width << "x" << height << "\n";
+                        }
 
                         // 生成文件名
                         std::stringstream rgb_filename, depth_filename;
                         rgb_filename << rgb_dir << "/frame_" 
                                     << std::setw(6) << std::setfill('0') 
-                                    << saved_count << ".jpg";
+                                    << saved_count << ".raw";
                         depth_filename << depth_dir << "/frame_"
                                       << std::setw(6) << std::setfill('0')
-                                      << saved_count << ".png";
+                                      << saved_count << ".raw";
 
-                        // 保存图像
-                        cv::cvtColor(rgb_image, rgb_image, cv::COLOR_RGB2BGR);
-                        cv::imwrite(rgb_filename.str(), rgb_image);
-                        cv::imwrite(depth_filename.str(), depth_image);
+                        // 保存原始数据
+                        // RGB: 3 bytes per pixel
+                        save_raw_data(rgb_filename.str(), color_frame.get_data(), width * height * 3);
+                        
+                        // Depth: 2 bytes per pixel (16-bit)
+                        save_raw_data(depth_filename.str(), depth_frame.get_data(), depth_width * depth_height * 2);
 
                         saved_count++;
 
@@ -131,8 +150,8 @@ int main(int argc, char* argv[]) {
         std::cout << "=========================================================\n";
         std::cout << "总帧数: " << frame_count << "\n";
         std::cout << "已保存: " << saved_count << " 帧\n";
-        std::cout << "RGB帧: " << rgb_dir << "\n";
-        std::cout << "Depth帧: " << depth_dir << "\n";
+        std::cout << "RGB Raw: " << rgb_dir << "\n";
+        std::cout << "Depth Raw: " << depth_dir << "\n";
         std::cout << "=========================================================\n";
 
         return 0;

@@ -31,9 +31,9 @@ def select_diverse_frames(image_dir, output_dir, num_samples=100, method='unifor
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # 收集所有图像
+    # 收集所有图像（递归搜索）
     image_extensions = {'.jpg', '.jpeg', '.png', '.bmp'}
-    image_files = sorted([f for f in image_dir.iterdir() 
+    image_files = sorted([f for f in image_dir.rglob('*') 
                          if f.suffix.lower() in image_extensions])
     
     if not image_files:

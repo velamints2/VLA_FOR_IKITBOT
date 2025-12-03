@@ -23,23 +23,34 @@ wheels/
 .installed.cfg
 *.egg
 
-# Data files
-data/raw/
+# Data files (大文件不上传)
+data/raw/*.bag
+data/extracted_frames/
 data/frames/
-*.bag
+data/seed_dataset/images/
 *.mkv
 *.oni
 *.mp4
 *.avi
+*.jpg
+*.jpeg
+*.png
+*.bmp
 
-# Model files
+# Model files (大文件不上传)
 models/pretrained/*.pt
 models/pretrained/*.pth
-models/checkpoints/*.pt
-models/checkpoints/*.pth
+models/checkpoints/
 *.onnx
 *.trt
 *.engine
+*.pt
+*.pth
+runs/
+
+# 保留必要的配置文件
+!configs/*.yaml
+!data/seed_dataset/classes.txt
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -62,3 +73,6 @@ logs/
 # Temporary files
 tmp/
 temp/
+
+# ROS相关
+extract_bag_frames/
