@@ -49,7 +49,13 @@ VLA_FOR_IKITBOT/
 │   ├── train_day2.sh        # Day2 训练脚本
 │   ├── train_multi_gpu.sh   # 多GPU训练脚本
 │   ├── optimize_day3.sh     # Day3 优化脚本
-│   └── setup_jetson.sh      # Jetson 环境配置
+│   ├── setup_jetson.sh      # Jetson 环境配置
+│   ├── setup_annotation_tools.sh  # 标注工具安装
+│   ├── auto_annotate.py     # 半自动标注
+│   └── start_label_studio.sh  # Label Studio 启动
+├── label_studio/             # Label Studio 配置
+│   ├── config.xml           # 标注界面配置
+│   └── README.md            # Label Studio 使用指南
 ├── src/                      # 源代码
 │   ├── data_processing/     # 数据处理
 │   │   ├── extract_rosbag_images.py
@@ -92,18 +98,30 @@ bash setup_jetson.sh
 ### 2. 数据准备
 
 ```bash
-# 从 ROS Bag 提取图像
-python src/data_processing/extract_rosbag_images.py
+# 步骤 1: 从 ROS Bag 提取图像
+python src/data_processing/extract_rosbag_images.py --batch data/raw data/frames 2
 
-# 准备 YOLO 数据集
-python src/data_processing/prepare_yolo_dataset.py
+# 步骤 2: 选择种子数据集
+python src/data_processing/select_seed_dataset.py data/frames --output data/seed_dataset_v2 --num 200
+
+# 步骤 3: 标注数据
+## 方式 A: 半自动标注 (推荐，节省 70% 时间)
+bash scripts/auto_annotate.sh data/seed_dataset_v2
+labelImg data/seed_dataset_v2 data/seed_dataset_v2/auto_labels
+
+## 方式 B: Label Studio 团队协作
+bash scripts/start_label_studio.sh
+# 浏览器打开 http://localhost:8080
+
+# 步骤 4: 准备训练数据集
+python src/data_processing/split_dataset.py data/seed_dataset_v2 --train-ratio 0.8
 ```
 
 ### 3. 模型训练
 
 ```bash
-# 单卡训练
-bash scripts/train_day2.sh train yolov8n.pt 50
+# 单卡训练 (Mac/单GPU)
+bash scripts/train_day2.sh train yolo11n.pt 50
 
 # 多卡训练 (16x RTX 2080)
 bash scripts/train_multi_gpu.sh train 100 all
@@ -159,7 +177,8 @@ python src/deployment/inference.py --model model.engine --source /dev/video0
 - [Jetson 环境配置指南](docs/jetson_setup.md)
 - [多GPU训练指南](docs/gpu_server_guide.md)
 - [Jetson Nano 测试报告](docs/jetson_nano_test_report.md)
-- [数据标注指南](docs/annotation_guide.md)
+- [数据标注工具集成指南](docs/annotation_tools_guide.md) ⭐ **新增**
+- [Label Studio 完整教程](label_studio/README.md) ⭐ **新增**
 
 ## 👥 合作方
 

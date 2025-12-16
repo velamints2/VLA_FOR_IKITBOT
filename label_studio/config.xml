@@ -1,0 +1,22 @@
+<View>
+  <Header value="障碍物检测标注"/>
+  <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  
+  <RectangleLabels name="label" toName="image" strokeWidth="3" smart="true">
+    <Label value="wire" background="#FF0000" hotkey="1"/>
+    <Label value="slipper" background="#0000FF" hotkey="2"/>
+    <Label value="sock" background="#00FF00" hotkey="3"/>
+    <Label value="cable" background="#FFFF00" hotkey="4"/>
+    <Label value="toy" background="#FF00FF" hotkey="5"/>
+    <Label value="obstacle" background="#FFA500" hotkey="6"/>
+  </RectangleLabels>
+  
+  <Choices name="quality" toName="image" choice="single">
+    <Choice value="clear" hint="图像清晰，目标明确"/>
+    <Choice value="blurry" hint="图像模糊"/>
+    <Choice value="occluded" hint="目标被遮挡"/>
+    <Choice value="difficult" hint="难以判断"/>
+  </Choices>
+  
+  <TextArea name="notes" toName="image" placeholder="备注信息..." maxSubmissions="1"/>
+</View>
