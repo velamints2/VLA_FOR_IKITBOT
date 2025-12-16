@@ -114,7 +114,7 @@ def get_optimal_batch_size(gpu_count: int, gpu_memory_gb: float, imgsz: int) -> 
 
 def train_ddp(
     data_config: str,
-    model_name: str = "yolov8n.pt",
+    model_name: str = "yolo11n.pt",
     epochs: int = 100,
     imgsz: int = 640,
     batch: int = -1,  # -1 表示自动计算
@@ -324,7 +324,7 @@ def benchmark_multi_gpu(gpus: str = "all"):
     print(f"测试GPU: {gpu_list}")
     
     # 创建测试数据
-    model = YOLO("yolov8n.pt")
+    model = YOLO("yolo11n.pt")
     
     # 测试不同GPU配置
     configs = [
@@ -383,7 +383,7 @@ def create_slurm_script(
     job_name: str,
     gpus: int = 16,
     epochs: int = 100,
-    model: str = "yolov8n.pt"
+    model: str = "yolo11n.pt"
 ):
     """生成SLURM集群提交脚本"""
     
@@ -462,7 +462,7 @@ def main():
     # DDP训练
     ddp_parser = subparsers.add_parser('ddp', help='多GPU DDP训练')
     ddp_parser.add_argument('--data', default='configs/data.yaml', help='数据配置')
-    ddp_parser.add_argument('--model', default='yolov8n.pt', help='模型名称')
+    ddp_parser.add_argument('--model', default='yolo11n.pt', help='模型名称')
     ddp_parser.add_argument('--epochs', type=int, default=100, help='训练轮数')
     ddp_parser.add_argument('--imgsz', type=int, default=640, help='图像大小')
     ddp_parser.add_argument('--batch', type=int, default=-1, help='Batch大小 (-1自动)')
@@ -492,7 +492,7 @@ def main():
     slurm_parser.add_argument('--name', default='obstacle_train', help='作业名称')
     slurm_parser.add_argument('--gpus', type=int, default=16, help='GPU数量')
     slurm_parser.add_argument('--epochs', type=int, default=100, help='训练轮数')
-    slurm_parser.add_argument('--model', default='yolov8n.pt', help='模型')
+    slurm_parser.add_argument('--model', default='yolo11n.pt', help='模型')
     
     args = parser.parse_args()
     

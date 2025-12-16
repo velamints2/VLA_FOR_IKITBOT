@@ -1,5 +1,5 @@
 # YOLO训练配置
-# 用于YOLOv10/v11/YOLOv8的数据集配置
+# 用于YOLO11/YOLOv10/YOLOv8的数据集配置
 
 # 数据路径（绝对路径更可靠）
 path: data/seed_dataset  # 数据集根目录

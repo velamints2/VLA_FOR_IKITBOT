@@ -90,7 +90,7 @@ bash scripts/train_multi_gpu.sh train 100 all
 # 或直接使用 Python
 python src/training/train_distributed.py ddp \
     --data configs/data.yaml \
-    --model yolov8n.pt \
+    --model yolo11n.pt \
     --epochs 100 \
     --gpus all \
     --amp \

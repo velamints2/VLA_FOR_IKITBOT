@@ -18,7 +18,7 @@
 
 | 组件 | 技术 |
 |------|------|
-| 训练框架 | PyTorch 2.x + Ultralytics YOLOv8 |
+| 训练框架 | PyTorch 2.x + Ultralytics YOLO11 |
 | 模型优化 | ONNX, TensorRT, INT8 量化 |
 | 部署平台 | Jetson Nano (JetPack 4.6, CUDA 10.2) |
 | 数据格式 | ROS Bag (RGBD) |

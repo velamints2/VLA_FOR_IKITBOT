@@ -20,7 +20,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_ROOT"
 
 # 默认参数
-MODEL="yolov8n.pt"
+MODEL="yolo11n.pt"
 EPOCHS=100
 IMGSZ=640
 GPUS="all"

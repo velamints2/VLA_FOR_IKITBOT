@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Day 2: 基线模型训练脚本
-支持 YOLOv8n, YOLOv10n, YOLO11n 等轻量级模型
+支持 YOLO11n, YOLOv10n, YOLOv8n 等轻量级模型（推荐使用 YOLO11n）
 
 功能:
 1. 模型选择与配置
@@ -56,9 +56,9 @@ def check_environment():
     return True
 
 
-def quick_validate(data_config: str, model_name: str = "yolov8n.pt"):
+def quick_validate(data_config: str, model_name: str = "yolo11n.pt"):
     """
-    快速验证训练流程（1-2 epoch）
+    快速验证训练（1-2 epoch）
     用于验证数据集和配置是否正确
     """
     from ultralytics import YOLO
@@ -88,7 +88,7 @@ def quick_validate(data_config: str, model_name: str = "yolov8n.pt"):
 
 def train_baseline(
     data_config: str,
-    model_name: str = "yolov8n.pt",
+    model_name: str = "yolo11n.pt",
     epochs: int = 50,
     imgsz: int = 640,
     batch: int = 16,
@@ -101,7 +101,7 @@ def train_baseline(
     
     Args:
         data_config: 数据配置文件路径
-        model_name: 模型名称 (yolov8n.pt, yolov10n.pt, yolo11n.pt)
+        model_name: 模型名称 (yolo11n.pt, yolov10n.pt, yolov8n.pt)
         epochs: 训练轮数
         imgsz: 输入图像大小
         batch: batch 大小
@@ -284,13 +284,13 @@ def main():
     # 快速验证
     validate_parser = subparsers.add_parser('validate', help='快速验证训练流程')
     validate_parser.add_argument('--data', default='configs/data.yaml', help='数据配置')
-    validate_parser.add_argument('--model', default='yolov8n.pt', help='模型')
+    validate_parser.add_argument('--model', default='yolo11n.pt', help='模型')
     
     # 训练
     train_parser = subparsers.add_parser('train', help='训练基线模型')
     train_parser.add_argument('--data', default='configs/data.yaml', help='数据配置')
-    train_parser.add_argument('--model', default='yolov8n.pt', 
-                             help='模型名称 (yolov8n.pt, yolov10n.pt, yolo11n.pt)')
+    train_parser.add_argument('--model', default='yolo11n.pt', 
+                             help='模型名称 (yolo11n.pt, yolov10n.pt, yolov8n.pt)')
     train_parser.add_argument('--epochs', type=int, default=50, help='训练轮数')
     train_parser.add_argument('--imgsz', type=int, default=640, help='图像大小')
     train_parser.add_argument('--batch', type=int, default=16, help='Batch大小')

@@ -15,7 +15,7 @@ export PYTORCH_ENABLE_MPS_FALLBACK=1
 
 # 参数
 MODE=${1:-"train"}
-MODEL=${2:-"yolov8n.pt"}
+MODEL=${2:-"yolo11n.pt"}
 EPOCHS=${3:-50}
 
 echo "=========================================="

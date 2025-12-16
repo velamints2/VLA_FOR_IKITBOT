@@ -117,7 +117,7 @@
 
 ### 第2天：基线模型训练 ⏳
 **目标**：在服务器上训练出可用的检测模型
-- [x] 2.1 选择轻量检测模型（YOLOv8n，3M参数）
+- [x] 2.1 选择轻量检测模型（YOLO11n，2.6M参数）
 - [x] 2.2 在种子数据集上进行快速训练（2 epoch验证流程）✅
 - [x] 2.3 多GPU分布式训练支持（16x RTX 2080）✅ NEW
 - [ ] 2.4 调整模型参数（输入分辨率、锚框设置）
@@ -362,7 +362,7 @@ bash scripts/train_multi_gpu.sh train 100 all
 # 4. 或直接使用Python
 python src/training/train_distributed.py ddp \
     --data configs/data.yaml \
-    --model yolov8n.pt \
+    --model yolo11n.pt \
     --epochs 100 \
     --gpus all
 ```
@@ -374,7 +374,7 @@ python src/training/train_distributed.py ddp \
 ### ✅ Day 2 任务进度
 
 #### 2.1 选择轻量检测模型 ✅
-- 选择 **YOLOv8n** 作为基线模型（3M 参数，8.2 GFLOPs）
+- 选择 **YOLO11n** 作为基线模型（2.6M 参数，6.5 GFLOPs，比 YOLOv8n 更快更轻）
 - 备选：YOLOv10n, YOLO11n
 
 #### 2.2 快速验证训练 ✅
@@ -408,7 +408,7 @@ python src/training/train_distributed.py ddp \
 
 **选项A：继续使用示例数据训练**
 ```bash
-bash scripts/train_day2.sh train yolov8n.pt 50
+bash scripts/train_day2.sh train yolo11n.pt 50
 ```
 
 **选项B：先完成真实标注**
