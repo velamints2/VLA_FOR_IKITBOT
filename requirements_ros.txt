@@ -1,0 +1,57 @@
+# ROS Demo 依赖文件
+# 用于扫地机器人障碍物检测系统的ROS演示
+
+# ==================== 核心依赖 ====================
+# YOLO模型推理
+ultralytics>=8.0.0
+
+# 图像处理
+opencv-python>=4.5.0
+numpy>=1.19.0
+Pillow>=8.0.0
+
+# ==================== ROS Python 依赖 ====================
+# 注意: 这些包通常通过 apt 安装，而非 pip
+# sudo apt install python3-rospy python3-cv-bridge python3-sensor-msgs
+
+# ROS Python 绑定 (仅作参考，实际通过apt安装)
+# rospkg
+# catkin_pkg
+
+# ==================== 可选优化依赖 ====================
+# ONNX 导出和推理
+onnx>=1.12.0
+onnxruntime>=1.12.0
+
+# 性能监控
+psutil>=5.9.0
+tqdm>=4.64.0
+
+# ==================== 开发依赖 ====================
+# 测试
+pytest>=7.0.0
+
+# 代码格式化
+black>=22.0.0
+flake8>=4.0.0
+
+# ==================== 平台特定依赖 ====================
+# Jetson Nano / RK3588 (需要手动安装适配版本)
+# torch (需要从NVIDIA/厂商官网下载对应版本)
+# torchvision
+# tensorrt (通过JetPack安装)
+
+# ==================== 安装说明 ====================
+# 
+# 1. 基础安装:
+#    pip install -r requirements_ros.txt
+#
+# 2. ROS包安装 (Ubuntu):
+#    sudo apt update
+#    sudo apt install ros-noetic-usb-cam ros-noetic-image-view ros-noetic-cv-bridge
+#
+# 3. Jetson Nano 特殊安装:
+#    # 使用NVIDIA提供的PyTorch wheel
+#    wget https://developer.download.nvidia.com/compute/redist/jp/v461/pytorch/torch-1.11.0a0+xxx.whl
+#    pip install torch-1.11.0a0+xxx.whl
+

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ROS1 障碍物检测演示启动文件
+    
+    使用方法:
+        # 实时摄像头模式
+        roslaunch obstacle_detection demo.launch realtime:=true
+        
+        # 视频文件模式
+        roslaunch obstacle_detection demo.launch realtime:=false video_path:=/path/to/video.mp4
+        
+        # 指定摄像头设备
+        roslaunch obstacle_detection demo.launch realtime:=true camera_device:=/dev/video1
+        
+        # 使用自定义模型
+        roslaunch obstacle_detection demo.launch model_path:=/path/to/model.pt
+-->
+<launch>
+    <!-- ==================== 参数定义 ==================== -->
+    
+    <!-- 运行模式: true=实时摄像头, false=视频文件 -->
+    <arg name="realtime" default="true"/>
+    
+    <!-- 摄像头参数 -->
+    <arg name="camera_device" default="/dev/video0"/>
+    <arg name="camera_width" default="640"/>
+    <arg name="camera_height" default="480"/>
+    <arg name="camera_fps" default="30"/>
+    
+    <!-- 视频文件路径 (非实时模式) -->
+    <arg name="video_path" default=""/>
+    
+    <!-- 模型参数 -->
+    <arg name="model_path" default="$(find obstacle_detection)/../models/best.pt"/>
+    <arg name="conf_threshold" default="0.5"/>
+    <arg name="device" default="cpu"/>  <!-- cpu, cuda, mps -->
+    <arg name="imgsz" default="640"/>
+    
+    <!-- 话题名称 -->
+    <arg name="input_topic" default="/camera/image_raw"/>
+    <arg name="output_topic" default="/obstacle_detection/result"/>
+    <arg name="info_topic" default="/obstacle_detection/info"/>
+    
+    <!-- 可视化 -->
+    <arg name="show_result" default="true"/>
+    
+    <!-- ==================== 实时摄像头模式 ==================== -->
+    <group if="$(arg realtime)">
+        
+        <!-- USB 摄像头节点 (usb_cam) -->
+        <node name="camera_node" pkg="usb_cam" type="usb_cam_node" output="screen">
+            <param name="video_device" value="$(arg camera_device)"/>
+            <param name="image_width" value="$(arg camera_width)"/>
+            <param name="image_height" value="$(arg camera_height)"/>
+            <param name="framerate" value="$(arg camera_fps)"/>
+            <param name="pixel_format" value="yuyv"/>
+            <param name="camera_frame_id" value="camera"/>
+            <param name="io_method" value="mmap"/>
+            <remap from="/usb_cam/image_raw" to="$(arg input_topic)"/>
+        </node>
+        
+        <!-- 障碍物检测节点 -->
+        <node name="obstacle_detector" pkg="obstacle_detection" 
+              type="obstacle_detector_node.py" output="screen" respawn="false">
+            <param name="model_path" value="$(arg model_path)"/>
+            <param name="conf_threshold" value="$(arg conf_threshold)"/>
+            <param name="device" value="$(arg device)"/>
+            <param name="imgsz" value="$(arg imgsz)"/>
+            <param name="input_topic" value="$(arg input_topic)"/>
+            <param name="output_topic" value="$(arg output_topic)"/>
+            <param name="info_topic" value="$(arg info_topic)"/>
+        </node>
+        
+    </group>
+    
+    <!-- ==================== 视频文件模式 ==================== -->
+    <group unless="$(arg realtime)">
+        
+        <!-- 视频文件发布节点 -->
+        <node name="video_publisher" pkg="image_publisher" type="image_publisher" 
+              output="screen" args="$(arg video_path)">
+            <param name="filename" value="$(arg video_path)"/>
+            <param name="flip_horizontal" value="false"/>
+            <param name="flip_vertical" value="false"/>
+            <param name="frame_id" value="camera"/>
+            <param name="publish_rate" value="30.0"/>
+            <remap from="image_raw" to="$(arg input_topic)"/>
+        </node>
+        
+        <!-- 障碍物检测节点 -->
+        <node name="obstacle_detector" pkg="obstacle_detection" 
+              type="obstacle_detector_node.py" output="screen" respawn="false">
+            <param name="model_path" value="$(arg model_path)"/>
+            <param name="conf_threshold" value="$(arg conf_threshold)"/>
+            <param name="device" value="$(arg device)"/>
+            <param name="imgsz" value="$(arg imgsz)"/>
+            <param name="input_topic" value="$(arg input_topic)"/>
+            <param name="output_topic" value="$(arg output_topic)"/>
+            <param name="info_topic" value="$(arg info_topic)"/>
+        </node>
+        
+    </group>
+    
+    <!-- ==================== 可视化工具 ==================== -->
+    <group if="$(arg show_result)">
+        
+        <!-- rqt_image_view 显示检测结果 -->
+        <node name="result_viewer" pkg="rqt_image_view" type="rqt_image_view" 
+              output="screen" args="$(arg output_topic)">
+        </node>
+        
+    </group>
+    
+    <!-- ==================== 调试信息 ==================== -->
+    <node name="detection_logger" pkg="rostopic" type="rostopic" 
+          args="echo $(arg info_topic)" output="screen" if="$(arg show_result)"/>
+
+</launch>
+

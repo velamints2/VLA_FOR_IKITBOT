@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    仅启动摄像头节点 (用于测试摄像头)
+    
+    使用方法:
+        roslaunch obstacle_detection camera_only.launch
+        roslaunch obstacle_detection camera_only.launch device:=/dev/video1
+-->
+<launch>
+    <arg name="device" default="/dev/video0"/>
+    <arg name="width" default="640"/>
+    <arg name="height" default="480"/>
+    <arg name="fps" default="30"/>
+    
+    <!-- USB 摄像头节点 -->
+    <node name="camera" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="$(arg device)"/>
+        <param name="image_width" value="$(arg width)"/>
+        <param name="image_height" value="$(arg height)"/>
+        <param name="framerate" value="$(arg fps)"/>
+        <param name="pixel_format" value="yuyv"/>
+        <param name="camera_frame_id" value="camera"/>
+        <param name="io_method" value="mmap"/>
+    </node>
+    
+    <!-- 图像查看器 -->
+    <node name="image_view" pkg="rqt_image_view" type="rqt_image_view" 
+          args="/usb_cam/image_raw" output="screen"/>
+</launch>
+

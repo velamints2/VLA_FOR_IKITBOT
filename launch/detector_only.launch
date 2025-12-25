@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    仅启动检测节点 (假设已有图像话题)
+    
+    使用方法:
+        roslaunch obstacle_detection detector_only.launch
+        roslaunch obstacle_detection detector_only.launch input_topic:=/my_camera/image
+-->
+<launch>
+    <!-- 参数 -->
+    <arg name="model_path" default="$(find obstacle_detection)/../models/best.pt"/>
+    <arg name="conf_threshold" default="0.5"/>
+    <arg name="device" default="cpu"/>
+    <arg name="imgsz" default="640"/>
+    <arg name="input_topic" default="/camera/image_raw"/>
+    <arg name="output_topic" default="/obstacle_detection/result"/>
+    <arg name="info_topic" default="/obstacle_detection/info"/>
+    
+    <!-- 障碍物检测节点 -->
+    <node name="obstacle_detector" pkg="obstacle_detection" 
+          type="obstacle_detector_node.py" output="screen" respawn="false">
+        <param name="model_path" value="$(arg model_path)"/>
+        <param name="conf_threshold" value="$(arg conf_threshold)"/>
+        <param name="device" value="$(arg device)"/>
+        <param name="imgsz" value="$(arg imgsz)"/>
+        <param name="input_topic" value="$(arg input_topic)"/>
+        <param name="output_topic" value="$(arg output_topic)"/>
+        <param name="info_topic" value="$(arg info_topic)"/>
+    </node>
+    
+    <!-- 结果查看器 -->
+    <node name="result_viewer" pkg="rqt_image_view" type="rqt_image_view" 
+          args="$(arg output_topic)" output="screen"/>
+          
+    <!-- 检测信息输出 -->
+    <node name="info_echo" pkg="rostopic" type="rostopic" 
+          args="echo $(arg info_topic)" output="screen"/>
+</launch>
+
