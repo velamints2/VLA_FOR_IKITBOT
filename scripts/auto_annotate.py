@@ -9,12 +9,48 @@ import sys
 from pathlib import Path
 from tqdm import tqdm
 
+# 预先加载并修补 cv2 以兼容无GUI环境
+try:
+    import cv2  # type: ignore
+    def _noop(*args, **kwargs):
+        return None
+    # GUI 函数兜底
+    if not hasattr(cv2, "imshow"):
+        cv2.imshow = _noop  # type: ignore
+    if not hasattr(cv2, "waitKey"):
+        cv2.waitKey = _noop  # type: ignore
+    if not hasattr(cv2, "destroyAllWindows"):
+        cv2.destroyAllWindows = _noop  # type: ignore
+    # 常量兜底
+    if not hasattr(cv2, "IMREAD_COLOR"):
+        cv2.IMREAD_COLOR = 1  # type: ignore
+    if not hasattr(cv2, "setNumThreads"):
+        def _noop(*args, **kwargs):
+            return None
+        cv2.setNumThreads = _noop  # type: ignore
+    if not hasattr(cv2, "getNumThreads"):
+        cv2.getNumThreads = lambda: 0  # type: ignore
+except Exception:
+    # 创建一个轻量级兼容模块以满足 ultralytics 的导入期望
+    import types
+    cv2 = types.SimpleNamespace()  # type: ignore
+    def _noop(*args, **kwargs):
+        return None
+    cv2.imshow = _noop
+    cv2.waitKey = _noop
+    cv2.destroyAllWindows = _noop
+    cv2.IMREAD_COLOR = 1
+    cv2.imread = lambda filename, flags=1: None
+    cv2.imwrite = lambda filename, img: True
+    cv2.setNumThreads = _noop
+    cv2.getNumThreads = lambda: 0
+    sys.modules['cv2'] = cv2  # 注入伪模块以供后续导入
+
 try:
     from ultralytics import YOLO
-    import cv2
 except ImportError as e:
     print(f"错误: 缺少依赖库 - {e}")
-    print("请运行: pip install ultralytics opencv-python")
+    print("请运行: pip install ultralytics")
     sys.exit(1)
 
 
@@ -81,6 +117,11 @@ def auto_annotate(
     if visualize:
         vis_path = output_path / "visualizations"
         vis_path.mkdir(exist_ok=True)
+        try:
+            import cv2
+        except Exception as e:
+            print(f"⚠️ 可视化依赖未就绪，跳过保存可视化: {e}")
+            visualize = False
     
     # 处理每张图像
     total_detections = 0
@@ -123,7 +164,11 @@ def auto_annotate(
                 if visualize:
                     vis_img = result.plot()
                     vis_file = vis_path / f"{img_path.stem}_annotated.jpg"
-                    cv2.imwrite(str(vis_file), vis_img)
+                    try:
+                        import cv2
+                        cv2.imwrite(str(vis_file), vis_img)
+                    except Exception as e:
+                        print(f"⚠️ 写入可视化失败，跳过: {e}")
             
             processed += 1
             

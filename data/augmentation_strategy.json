@@ -1,0 +1,40 @@
+{
+  "local_data": {
+    "source": "data/seed_dataset_v2",
+    "augmentation_multiplier": 5,
+    "intensity": 0.5,
+    "output": "data/augmented_dataset",
+    "expected_count": 1000
+  },
+  "open_source_data": {
+    "coco": {
+      "enabled": false,
+      "source": "data/coco/train2017",
+      "json": "data/coco/annotations/instances_train2017.json",
+      "target_classes": [
+        "sock",
+        "shoe",
+        "teddy bear",
+        "tie"
+      ],
+      "count": 3000
+    },
+    "open_images": {
+      "enabled": false,
+      "source": "data/open_images",
+      "classes": [
+        "Wire",
+        "Cable",
+        "Sock",
+        "Shoe",
+        "Toy"
+      ],
+      "count": 2000
+    }
+  },
+  "training_split": {
+    "local_augmented": 0.7,
+    "open_source": 0.3,
+    "total_expected": 2500
+  }
+}

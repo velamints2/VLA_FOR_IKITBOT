@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Presentation Cover</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #f9fafb;
+            color: #1e293b;
+            overflow: hidden;
+        }
+
+        /* Animated Grid Background (lighter tone) */
+        .bg-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
+        }
+
+        /* Light Glass Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-card {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            background: rgba(255,255,255,0.7);
+        }
+        
+        .topic-card:hover {
+            transform: translateX(5px);
+            background: rgba(56, 189, 248, 0.15);
+            border-left: 3px solid #38bdf8;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex items-center justify-center relative">
+
+    <div class="bg-grid"></div>
+    
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-[-1]">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-200/30 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-300/30 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="relative w-full max-w-6xl aspect-video glass-panel rounded-2xl p-12 flex flex-col justify-between overflow-hidden">
+        
+        <!-- Top Info Bar -->
+        <div class="flex justify-between items-center text-cyan-700 text-sm font-mono tracking-widest uppercase opacity-80">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span>
+                CS 16-Week Seminar
+            </div>
+            <div>2024-2025 Semester</div>
+        </div>
+
+        <div class="flex flex-row gap-12 h-full mt-8">
+            
+            <!-- Left Section -->
+            <div class="w-2/5 flex flex-col justify-center">
+                <div class="mb-2 inline-block px-3 py-1 rounded-full bg-cyan-100 border border-cyan-300 text-cyan-700 text-xs font-semibold w-fit">
+                    SYSTEM SECURITY OVERVIEW
+                </div>
+                <h1 class="text-6xl font-bold text-gray-800 mb-4 tracking-tight glow-text leading-tight">
+                    Security
+                    <span class="block text-3xl font-light text-gray-500 mt-2">Systems & Architecture</span>
+                </h1>
+                <p class="text-gray-600 text-lg leading-relaxed mb-8 border-l-2 border-gray-300 pl-4">
+                    深入探讨现代信息安全体系的核心支柱，从身份认证到分布式系统防护的全面解析。
+                </p>
+                <div class="h-1 w-24 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
+            </div>
+
+            <!-- Right Section -->
+            <div class="w-3/5 grid grid-cols-1 gap-4 content-center">
+                
+                <!-- Topic 1 -->
+                <div class="topic-card p-4 rounded-lg flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 group-hover:text-white group-hover:bg-blue-500 transition-colors">
+                            <i class="fa-solid fa-fingerprint text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-800 font-semibold text-lg">Authentication</h3>
+                            <p class="text-gray-500 text-xs">身份认证机制</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-cyan-700 bg-cyan-100 px-3 py-1 rounded border border-cyan-200">
+                            刘瑞羽
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Topic 2 -->
+                <div class="topic-card p-4 rounded-lg flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 group-hover:text-white group-hover:bg-purple-500 transition-colors">
+                            <i class="fa-solid fa-key text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-800 font-semibold text-lg">Cryptography</h3>
+                            <p class="text-gray-500 text-xs">密码学原理</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-purple-700 bg-purple-100 px-3 py-1 rounded border border-purple-200">
+                            吴文强
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Topic 3 -->
+                <div class="topic-card p-4 rounded-lg flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:text-white group-hover:bg-emerald-500 transition-colors">
+                            <i class="fa-solid fa-shield-halved text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-800 font-semibold text-lg">Access Control</h3>
+                            <p class="text-gray-500 text-xs">访问控制策略</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-emerald-700 bg-emerald-100 px-3 py-1 rounded border border-emerald-200">
+                            王子恒
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Topic 4 -->
+                <div class="topic-card p-4 rounded-lg flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white group-hover:bg-orange-500 transition-colors">
+                            <i class="fa-solid fa-network-wired text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-800 font-semibold text-lg">Distributed Security</h3>
+                            <p class="text-gray-500 text-xs">分布式系统安全</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-orange-700 bg-orange-100 px-3 py-1 rounded border border-orange-200">
+                            周相吉
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-4 border-t border-gray-200 flex justify-between items-center text-gray-500 text-xs">
+            <div>Class Presentation Group 4</div>
+            <div class="flex gap-4">
+                <span><i class="fa-solid fa-school mr-1"></i> Dept. of Computer Science</span>
+                <span><i class="fa-solid fa-calendar mr-1"></i> Week 16</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

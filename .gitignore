@@ -4,9 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -22,28 +19,15 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Data files (原始大文件不上传)
-data/raw/*.bag
-data/extracted_frames/
-*.mkv
-*.oni
-*.mp4
-*.avi
-
-# Model files (训练过程文件不上传)
-models/checkpoints/
-*.onnx
-*.trt
-*.engine
-runs/
-
-# 保留必要的配置文件
-!configs/*.yaml
-!data/seed_dataset/classes.txt
-
-# Jupyter Notebook
-.ipynb_checkpoints
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
 
 # IDE
 .vscode/
@@ -54,15 +38,55 @@ runs/
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Data files
+*.pt
+*.pth
+*.onnx
+*.rknn
+*.h5
+*.pkl
+*.pickle
+
+# Training data and models (exclude large files)
+data/augmented_dataset/
+data/training_data/
+models/
+
+# Label Studio
+label_studio/data/
+label_studio/ml_backend/
+
+# YOLO backend
+yolo_backend/
 
 # Logs
 logs/
 *.log
 
 # Temporary files
-tmp/
-temp/
+*.tmp
+*.temp
 
-# ROS相关
-extract_bag_frames/
+# Jupyter
+.ipynb_checkpoints/
+
+# ROS
+*.bag
+
+# Backup files
+*.backup
+*.bak
+
+# Large data directories (comment out if you want to include them)
+# data/frames/
+# data/seed_dataset_v2/
+
+# Exclude specific large files
+yolov8n.pt.backup
